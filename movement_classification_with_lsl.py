@@ -338,8 +338,8 @@ def main():
     lsl_outlet.push_sample([
         f"camera_open: {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}"
     ])
-
-    record_svo(opt.participant_id, zed, lsl_outlet)
+    # RECORDING CAPABILITY IS CURRENTLY BUGGED
+    # record_svo(opt.participant_id, zed, lsl_outlet)
 
     # Enable Positional tracking (mandatory for object detection)
     positional_tracking_parameters = sl.PositionalTrackingParameters()
