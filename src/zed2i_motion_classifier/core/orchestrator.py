@@ -1,8 +1,7 @@
-"""Main processing script."""
+"""Python based runner."""
 
 import cv2
 import pyzed.sl as sl
-import argparse
 from pylsl import StreamInfo, StreamOutlet
 
 from datetime import datetime
@@ -11,7 +10,7 @@ from display import tracking_viewer
 from core import export, initialize_parameters
 
 
-def main():
+def run(participant_id):
     # Create a Camera object
     zed = sl.Camera()
 
@@ -28,7 +27,7 @@ def main():
 
     # Initialize parameters and start svo recording
     initialize_parameters.initialize_zed_parameters(zed, lsl_outlet)
-    export.record_svo(opt.participant_id, zed, lsl_outlet)
+    export.record_svo(participant_id, zed, lsl_outlet)
     body_param, body_runtime_param = (
         initialize_parameters.initialize_tracking_parameters
     )
@@ -122,13 +121,3 @@ def main():
     ])
 
     cv2.destroyAllWindows()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-p", "--participant_id", required=True, type=str, help="Participant ID"
-    )
-    opt = parser.parse_args()
-
-    main()
