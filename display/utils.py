@@ -2,6 +2,7 @@
 
 import pyzed.sl as sl
 
+
 ID_COLORS = [
     (232, 176, 59),
     (175, 208, 25),
@@ -12,7 +13,12 @@ ID_COLORS = [
 
 
 def render_object(object_data, is_tracking_on) -> any:
-    """Render object."""
+    """Check to render object if object is tracked.
+
+    Args:
+        object_data: zed parameters for tracked person.
+        is_tracking_on: boolean value determining if a body is a tracked object in zed sdk.
+    """
     if is_tracking_on:
         return object_data.tracking_state == sl.OBJECT_TRACKING_STATE.OK
     else:
@@ -22,7 +28,14 @@ def render_object(object_data, is_tracking_on) -> any:
 
 
 def generate_color_id_u(idx) -> list[int] | list:
-    """Generate color for skeleton display."""
+    """Generate color for skeleton display.
+
+    Args:
+        idx: object or tracked body id value.
+
+    Returns:
+        arr: list of RGB values for skeleton display.
+    """
     arr = []
     if idx < 0:
         arr = [236, 184, 36, 255]

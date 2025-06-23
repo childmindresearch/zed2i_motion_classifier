@@ -3,17 +3,33 @@
 import cv2
 import pyzed.sl as sl
 
-import utils
+from display import utils
 
 
 def cvt(pt, scale) -> list:
-    """Function that scales point coordinates."""
+    """Function that scales point coordinates to the image scale
+
+    Args:
+        pt: 3d keypoint of joint.
+        scale: image display scale.
+
+    Return:
+        out: list of scaled keypoint values.
+    """
     out = [pt[0] * scale[0], pt[1] * scale[1]]
     return out
 
 
 def render_sk(left_display, img_scale, obj, color, BODY_BONES) -> None:
-    """Render the skeleton."""
+    """Render the skeleton on top of opencv RGB camera feed.
+
+    Args:
+        left_display: left RGB image from zed camera.
+        img_scale: image display scale.
+        obj: skeleton of tracked person.
+        color: display color for tracked skeleton.
+        BODY_BONES: Skeleton type to display (18, 34, or 38).
+    """
     for part in BODY_BONES:
         kp_a = cvt(obj.keypoint_2d[part[0].value], img_scale)
         kp_b = cvt(obj.keypoint_2d[part[1].value], img_scale)
@@ -45,7 +61,15 @@ def render_sk(left_display, img_scale, obj, color, BODY_BONES) -> None:
 
 
 def render_2D(left_display, img_scale, objects, is_tracking_on, body_format) -> None:
-    """Render joints and bones."""
+    """Render joints and bones ontop of RGB live camera feed.
+
+    Args:
+        left_display: left RGB image from zed camera.
+        img_scale: image display scale.
+        objects: list of skeletons or tracked people in frame.
+        is_tracking_on: Boolean value determining if a body is a tracked object in zed sdk.
+        body_format: Zed skeleton type to display (18, 34, or 38).
+    """
     overlay = left_display.copy()
 
     # Render skeleton joints and bones

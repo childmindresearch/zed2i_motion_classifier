@@ -109,5 +109,5 @@ cd zed2i_motion_classifier
 Run the pipeline with Participant ID 100
 
 ```sh
-uv run movement_classification_with_lsl.py -p "100"
+uv run __main__.py -p "100"
 ```
