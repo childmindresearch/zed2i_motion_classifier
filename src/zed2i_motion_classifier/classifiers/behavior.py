@@ -21,7 +21,7 @@ def update_joint_history(person) -> None:
             config.joint_histories[person.id][joint].append(np.array(kp))
 
 
-def compute_velocity(positions) -> np.array:
+def compute_velocity(positions) -> np.ndarray:
     """Compute velocities between frames for all saved frames for 1 joint.
 
     Args:

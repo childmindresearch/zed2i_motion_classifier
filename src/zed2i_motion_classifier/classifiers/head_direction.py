@@ -3,35 +3,53 @@
 import numpy as np
 import core.config as config
 from collections import deque
+from typing import List, Union
 from scipy.spatial.transform import Rotation as R
 
 
-def extract_orientation_features(skeleton):
+def extract_orientation_features(skeleton) -> np.ndarray:
+    """This function calculates the quaternion of each joint.
+
+    Args:
+        skeleton: zed tracked body.
+
+    Returns:
+        an array of quaternions of all joints for the current frame.
+    """
     features = []
     for joint_id in config.POSTURE_JOINTS:
         quat = skeleton.local_orientation_per_joint[joint_id]  # [x, y, z, w]
         rot = R.from_quat(quat)
         # Convert quaternion to Euler angles (radians)
-        euler = rot.as_euler("xyz", degrees=True)  # or 'zyx' depending on preference
+        euler = rot.as_euler("xyz", degrees=True)
         features.extend(euler)  # flatten into feature vector
     return np.array(features)
 
 
-def detect_postural_shift(person_id, skeleton):
-    global posture_history
+def detect_postural_shift(person) -> Union[bool, List[bool]]:
+    """This function determines if postural shift has occured.
 
-    features = extract_orientation_features(skeleton)
+    A sliding window of past postures features is saved in posture_history. This function checks if the differences
+    in the current frame's features and the posture history is larger than the posture threshold.
 
-    if person_id not in posture_history:
-        posture_history[person_id] = deque(maxlen=config.POSTURE_WINDOW)
+    Args:
+        person: zed tracked body.
 
-    posture_history[person_id].append(features)
+    Returns:
+        single boolean value or list of boolean values.
+    """
+    features = extract_orientation_features(person)
+
+    if person.id not in config.posture_history:
+        config.posture_history[person.id] = deque(maxlen=config.POSTURE_WINDOW)
+
+    config.posture_history[person.id].append(features)
 
     # Compare latest posture to average of earlier
-    if len(posture_history[person_id]) < config.POSTURE_WINDOW:
+    if len(config.posture_history[person.id]) < config.POSTURE_WINDOW:
         return False  # Not enough data yet
 
-    baseline = np.mean(list(posture_history[person_id])[:-5], axis=0)
+    baseline = np.mean(list(config.posture_history[person.id])[:-5], axis=0)
     latest = features
     diff = np.linalg.norm(latest - baseline)
 
@@ -39,38 +57,40 @@ def detect_postural_shift(person_id, skeleton):
 
 
 def normalize(v):
+    """This function calculates the norm to a vector (v).
+
+    Args:
+        v: vector to normalize.
+
+    Returns:
+        normalized vector (length 1).
+    """
     norm = np.linalg.norm(v)
     return v / norm if norm > 1e-6 else v
 
 
-def angle_between(v1, v2):
-    """Returns the angle in degrees between vectors 'v1' and 'v2'"""
-    v1_u = normalize(v1)
-    v2_u = normalize(v2)
-    dot_product = np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)
-    return np.degrees(np.arccos(dot_product))
+def get_head_orientation_with_posture(body) -> str | bool:
+    """Function to classify head orientation.
 
+    This function calculates the directional vetors from the tracked joints. Those vectors are used to calculates the head's pitch and yaw.
+    detect_postural_shift is then called in order to offset any changes in head direction with a postural shift and a final head orientation
+    classification is made after checking against threshold values.
 
-def get_head_orientation_with_posture(body):
-    kp = body.keypoint
+    Args:
+        body: zed tracked body.
 
-    NOSE = 5
-    NECK = 4
-    SPINE3 = 3
-    LEFT_SHOULDER = 12
-    RIGHT_SHOULDER = 13
-
-    if any(
-        np.allclose(kp[j], [0, 0, 0])
-        for j in [NOSE, NECK, SPINE3, LEFT_SHOULDER, RIGHT_SHOULDER]
-    ):
+    Returns:
+        orientation: str containing pitch and/or yaw classifications.
+        postural_shift: Boolean value or list of boolean values if postural shift occurred in the frame.
+    """
+    if any(np.allclose(body.keypoint[j], [0, 0, 0]) for j in [5, 4, 3, 12, 13]):
         return "unknown"
 
-    neck = kp[NECK]
-    nose = kp[NOSE]
-    spine3 = kp[SPINE3]
-    left_shoulder = kp[LEFT_SHOULDER]
-    right_shoulder = kp[RIGHT_SHOULDER]
+    neck = body.keypoint[4]
+    nose = body.keypoint[5]
+    spine3 = body.keypoint[3]
+    left_shoulder = body.keypoint[12]
+    right_shoulder = body.keypoint[13]
 
     # Vectors
     neck_to_nose = nose - neck
@@ -78,14 +98,17 @@ def get_head_orientation_with_posture(body):
     shoulder_axis = right_shoulder - left_shoulder
 
     # Pitch (up/down)
-    pitch_angle = angle_between(neck_to_nose, neck_to_spine)
+    neck_to_nose_u = normalize(neck_to_nose)
+    neck_to_spine_u = normalize(neck_to_spine)
+    dot_product = np.clip(np.dot(neck_to_nose_u, neck_to_spine_u), -1.0, 1.0)
+    pitch_angle = np.degrees(np.arccos(dot_product))
 
     # Yaw (left/right) - project onto shoulder plane
     shoulder_axis_norm = normalize(shoulder_axis)
     yaw_proj = np.dot(normalize(neck_to_nose), shoulder_axis_norm)
 
     # Detect postural shift
-    postural_shift = detect_postural_shift(body.id, body)
+    postural_shift = detect_postural_shift(body)
 
     # Thresholds
     pitch_up_thresh = 150
