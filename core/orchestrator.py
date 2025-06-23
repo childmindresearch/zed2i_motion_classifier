@@ -39,9 +39,23 @@ def run(participant_id):
     # Initialize parameters and start svo recording
     initialize_parameters.initialize_zed_parameters(zed, lsl_outlet)
     export.record_svo(participant_id, zed, lsl_outlet)
-    body_param, body_runtime_param = (
-        initialize_parameters.initialize_tracking_parameters
-    )
+    positional_tracking_parameters = sl.PositionalTrackingParameters()
+    positional_tracking_parameters.set_as_static = True  # camera is static
+    zed.enable_positional_tracking(positional_tracking_parameters)
+
+    # Set Body Tracking parameters
+    body_param = sl.BodyTrackingParameters()
+    body_param.enable_tracking = True  # Track people across images flow
+    body_param.enable_body_fitting = True  # Smooth skeleton move
+    body_param.detection_model = getattr(sl.BODY_TRACKING_MODEL, config.DETECTION_MODEL)
+    body_param.body_format = (
+        sl.BODY_FORMAT.BODY_38
+    )  # Choose the BODY_FORMAT you wish to use
+    zed.enable_body_tracking(body_param)
+
+    # Set Body Tracking Runtime parameters
+    body_runtime_param = sl.BodyTrackingRuntimeParameters()
+    body_runtime_param.detection_confidence_threshold = 50
     display_resolution, image_scale = initialize_parameters.display_utilities(zed)
 
     # Create ZED objects filled in the main loop
