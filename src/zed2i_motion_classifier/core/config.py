@@ -1,4 +1,4 @@
-"""File containing all global parameters and thresholds for classifications."""
+"""File containing all global parameters, variables, thresholds, and dictionaries for classifications."""
 
 POSTURE_WINDOW = 30  # frames (1 second @ 30fps)
 POSTURE_THRESHOLD = 10  # quaternion difference threshold (tune this)

@@ -4,7 +4,12 @@ from config import DEPTH_MODE, DETECTION_MODEL
 
 
 def initialize_zed_parameters(zed, lsl_outlet):
-    # Create a InitParameters object and set configuration parameters
+    """Create a InitParameters object and set configuration parameters.
+
+    Args:
+        zed: zed camera object.
+        lsl_outlet: pylsl object to stream markers.
+    """
     init_params = sl.InitParameters()
     init_params.camera_resolution = sl.RESOLUTION.HD1080  # Use HD1080 video mode
     init_params.camera_fps = 30
@@ -25,7 +30,11 @@ def initialize_zed_parameters(zed, lsl_outlet):
 
 
 def initialize_tracking_parameters(zed):
-    # Enable Positional tracking (mandatory for object detection)
+    """Enable positional tracking and body tracking parameters.
+
+    Args:
+        zed: zed camera object.
+    """
     positional_tracking_parameters = sl.PositionalTrackingParameters()
     positional_tracking_parameters.set_as_static = True  # camera is static
     zed.enable_positional_tracking(positional_tracking_parameters)
@@ -48,7 +57,11 @@ def initialize_tracking_parameters(zed):
 
 
 def display_utilities(zed):
-    # Get ZED camera information
+    """Set the opencv display resolution and scale.
+
+    Args:
+        zed: zed camera object.
+    """
     camera_info = zed.get_camera_information()
 
     # 2D viewer utilities

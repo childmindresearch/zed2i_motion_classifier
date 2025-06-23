@@ -11,6 +11,17 @@ from core import export, initialize_parameters
 
 
 def run(participant_id):
+    """This function is responsible for the main processing of the pipeline.
+
+    The pipeline first waits for the user to initiate the lsl stream in LabRecorder. Enter "c" once complete.
+    An svo recording and the zed parameters are then initialized. The main processing loop then begins where for every frame,
+    the position, behavior, and ehad direction classificatiosn are calculated and returned in the terminal. A live
+    display with a skeleton overlay also appears. The pipeline will run indefinitely until user intervention when the user either
+    clicks "q" to quit or "d" when done.
+
+    Args:
+        participant_id: cli user input str containing ID number.
+    """
     # Create a Camera object
     zed = sl.Camera()
 
