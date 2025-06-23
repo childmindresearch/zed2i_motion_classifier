@@ -3,14 +3,12 @@
 import cv2
 import pyzed.sl as sl
 import argparse
-import os
-import pathlib as pl
 from pylsl import StreamInfo, StreamOutlet
 
 from datetime import datetime
 from classifiers import behavior, head_direction
 from display import tracking_viewer
-from core import export
+from core import export, initialize_parameters
 
 
 def main():
@@ -28,56 +26,13 @@ def main():
         if key == "c":
             break
 
-    # Create a InitParameters object and set configuration parameters
-    init_params = sl.InitParameters()
-    init_params.camera_resolution = sl.RESOLUTION.HD1080  # Use HD1080 video mode
-    init_params.coordinate_units = sl.UNIT.METER  # Set coordinate units
-    init_params.depth_mode = sl.DEPTH_MODE.NEURAL
-    init_params.coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
-
-    # Open the camera
-    err = zed.open(init_params)
-    if err != sl.ERROR_CODE.SUCCESS:
-        exit(1)
-
-    start_time = datetime.now()
-    lsl_outlet.push_sample([
-        f"camera_open: {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}"
-    ])
-
+    # Initialize parameters and start svo recording
+    initialize_parameters.initialize_zed_parameters(zed, lsl_outlet)
     export.record_svo(opt.participant_id, zed, lsl_outlet)
-
-    # Enable Positional tracking (mandatory for object detection)
-    positional_tracking_parameters = sl.PositionalTrackingParameters()
-    positional_tracking_parameters.set_as_static = True  # camera is static
-    zed.enable_positional_tracking(positional_tracking_parameters)
-
-    # Set Body Tracking parameters
-    body_param = sl.BodyTrackingParameters()
-    body_param.enable_tracking = True  # Track people across images flow
-    body_param.enable_body_fitting = True  # Smooth skeleton move
-    body_param.detection_model = sl.BODY_TRACKING_MODEL.HUMAN_BODY_ACCURATE
-    body_param.body_format = (
-        sl.BODY_FORMAT.BODY_38
-    )  # Choose the BODY_FORMAT you wish to use
-    zed.enable_body_tracking(body_param)
-
-    # Set Body Tracking Runtime parameters
-    body_runtime_param = sl.BodyTrackingRuntimeParameters()
-    body_runtime_param.detection_confidence_threshold = 50
-
-    # Get ZED camera information
-    camera_info = zed.get_camera_information()
-
-    # 2D viewer utilities
-    display_resolution = sl.Resolution(
-        min(camera_info.camera_configuration.resolution.width, 1280),
-        min(camera_info.camera_configuration.resolution.height, 720),
+    body_param, body_runtime_param = (
+        initialize_parameters.initialize_tracking_parameters
     )
-    image_scale = [
-        display_resolution.width / camera_info.camera_configuration.resolution.width,
-        display_resolution.height / camera_info.camera_configuration.resolution.height,
-    ]
+    display_resolution, image_scale = initialize_parameters.display_utilities(zed)
 
     # Create ZED objects filled in the main loop
     image = sl.Mat()

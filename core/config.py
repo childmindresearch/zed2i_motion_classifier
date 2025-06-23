@@ -13,3 +13,6 @@ FIDGET_JOINTS = [16, 17, 32, 33, 34, 35, 36, 37]  # wrists and fingers
 posture_history = {}  # person_id: deque of posture feature vectors
 joint_histories = {}  # person_id: joint position history
 frame_behavior_log = []  # to save classifications: (frame_id, person_id, behavior)
+
+DEPTH_MODE = "NEURAL"
+DETECTION_MODEL = "HUMAN_BODY_ACCURATE"
