@@ -1,6 +1,6 @@
 import pyzed.sl as sl
 from datetime import datetime
-from config import DEPTH_MODE, DETECTION_MODEL
+from core import config
 
 
 def initialize_zed_parameters(zed, lsl_outlet):
