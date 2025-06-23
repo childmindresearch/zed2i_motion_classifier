@@ -1,9 +1,7 @@
-"""File containing functions for recording svo file and additional data."""
-
 import os
-import pyzed.sl as sl
 import pathlib as pl
 from datetime import datetime
+import pyzed as sl
 
 
 def record_svo(participant_ID, zed, lsl_outlet):

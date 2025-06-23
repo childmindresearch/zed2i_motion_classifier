@@ -1,13 +1,16 @@
 """Main processing script."""
 
+import cv2
 import pyzed.sl as sl
 import argparse
-
+import os
+import pathlib as pl
 from pylsl import StreamInfo, StreamOutlet
 
 from datetime import datetime
 from classifiers import behavior, head_direction
 from display import tracking_viewer
+from core import export
 
 
 def main():
@@ -42,7 +45,7 @@ def main():
         f"camera_open: {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}"
     ])
 
-    record.record_svo(opt.participant_id, zed, lsl_outlet)
+    export.record_svo(opt.participant_id, zed, lsl_outlet)
 
     # Enable Positional tracking (mandatory for object detection)
     positional_tracking_parameters = sl.PositionalTrackingParameters()
