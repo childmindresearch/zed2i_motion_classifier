@@ -7,7 +7,7 @@ from pylsl import StreamInfo, StreamOutlet
 from datetime import datetime
 from classifiers import behavior, head_direction
 from display import tracking_viewer
-from core import export, initialize_parameters
+from core import export, initialize_parameters, config
 
 
 def run(participant_id):
