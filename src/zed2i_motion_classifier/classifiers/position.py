@@ -1,21 +1,38 @@
-"""file containg functions for classifying position."""
+"""file containing functions for classifying position."""
 
 import numpy as np
 
 
-def compute_knee_angle(hip, knee, ankle):
-    # Vector from knee to hip (thigh) and knee to ankle (shin)
+def compute_knee_angle(hip, knee, ankle) -> float:
+    """This function computes the angle of knee flexion in teh sagittal plane.
+
+    Args:
+        hip: 3d keypoint values of the hip joint in 1 frame.
+        knee: 3d keypoint values of the knee joint in 1 frame.
+        ankle: 3d keypoint values of the ankles joint in 1 frame.
+
+    Returns:
+        angle (in degrees) of knee flexion.
+    """
     thigh = hip - knee
     shin = ankle - knee
     if np.linalg.norm(thigh) == 0 or np.linalg.norm(shin) == 0:
         return 0
     cosine_angle = np.dot(thigh, shin) / (np.linalg.norm(thigh) * np.linalg.norm(shin))
     angle_rad = np.arccos(np.clip(cosine_angle, -1.0, 1.0))
-    angle_deg = np.degrees(angle_rad)
-    return angle_deg
+
+    return np.degrees(angle_rad)
 
 
-def classify_position(skeleton):
+def classify_position(skeleton) -> str:
+    """This function classifies position based on knee flexion.
+
+    Args:
+        skeleton: zed tracked body.
+
+    Returns:
+        str describing position.
+    """
     left_hip = skeleton.keypoint[18]
     left_knee = skeleton.keypoint[20]
     left_ankle = skeleton.keypoint[22]
