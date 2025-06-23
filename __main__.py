@@ -1,6 +1,6 @@
 """Main function for mobi_motion_tracking."""
 
-from zed2i_motion_classifier.core import cli
+from core import cli
 
 
 def run_main() -> None:
