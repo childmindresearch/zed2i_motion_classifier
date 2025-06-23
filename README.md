@@ -52,9 +52,14 @@ Below is a complete list of all possible LSL event markers to be streamed depend
     - Click apply and Ok
     - Restart your terminal
 
-3. Create a virtual environment. Any environment management tool can be used, but the following steps describe setting up a uv venv:
+3. Navigate to the ZED SDK folder:
+```sh
+cd "C:\Program Files (x86)\ZED SDK"
+```
 
-***NOTE:*** If you already have a zed2i_lsl_venv correctly setup from https://github.com/childmindresearch/zed2i_3d_lsl_capture, use the same environment and install the packages listed in step 5.
+4. Create a virtual environment. Any environment management tool can be used, but the following steps describe setting up a uv venv:
+
+***NOTE:*** If you already have a zed2i_lsl_venv correctly setup from https://github.com/childmindresearch/zed2i_3d_lsl_capture, use the same environment and install the packages listed in step 6.
 
 create a virtual environment named zed2i_lsl_venv
 ```sh
@@ -62,10 +67,10 @@ uv venv zed2i_lsl_venv
 ```
  activate the environment
 ```sh
-zed2i_lsl_venv\Source\activate
+zed2i_lsl_venv/Scripts/activate
 ```
 
-4. Install the ZED Python API. Installation support documentation can be found here on the Stereolabs website (https://www.stereolabs.com/docs/app-development/python/install). However, follow our steps below for proper CMI/MoBI-specific API installation:
+5. Install the ZED Python API. Installation support documentation can be found here on the Stereolabs website (https://www.stereolabs.com/docs/app-development/python/install). However, follow our steps below for proper CMI/MoBI-specific API installation:
 
 ensure pip is installed 
 ```sh
@@ -77,14 +82,11 @@ uv pip install cython numpy opencv-python requests
 ```
 run get_python_api.py
 ```sh
-cd "C:\Program Files (x86)\ZED SDK"
-```
-```sh
 uv run get_python_api.py
 ```
 
 
-5. Install repository-dependent packages
+6. Install repository-dependent packages
 
 ```sh
 uv pip install scipy pylsl
@@ -92,13 +94,6 @@ uv pip install scipy pylsl
 
 
 ## Quick start
-
-Navigate to the ZED SDK directory:
-
-```sh
-cd "C:\Program Files (x86)\ZED SDK"
-```
-
 Clone this repository inside ZED SDK:
 
 ```sh
