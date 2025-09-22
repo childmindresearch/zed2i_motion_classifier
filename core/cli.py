@@ -1,7 +1,6 @@
 """CLI for zed2i_motion_classifier."""
 
 import argparse
-from typing import List, Optional
 
 from core import orchestrator
 
