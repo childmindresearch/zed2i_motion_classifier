@@ -109,19 +109,19 @@ def run(participant_id: str, display: bool = False) -> None:
                     lsl_outlet.push_sample(["POSTURAL SHIFT detected"])
                     print(f"Frame {f} - POSTURAL SHIFT detected")
 
-                # Display skeletons
-            if display:
-                zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
-                image_left_ocv = image.get_data()
-                tracking_viewer.render_2D(
-                    image_left_ocv,
-                    image_scale,
-                    [selected_body],
-                    body_param.enable_tracking,
-                    body_param.body_format,
-                )
-                cv2.imshow("ZED | 2D View", image_left_ocv)
-                cv2.moveWindow("ZED | 2D View", 100, 100)
+                    # Display skeletons
+                if display:
+                    zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
+                    image_left_ocv = image.get_data()
+                    tracking_viewer.render_2D(
+                        image_left_ocv,
+                        image_scale,
+                        [selected_body],
+                        body_param.enable_tracking,
+                        body_param.body_format,
+                    )
+                    cv2.imshow("ZED | 2D View", image_left_ocv)
+                    cv2.moveWindow("ZED | 2D View", 100, 100)
 
         # Zed connection failed
         elif zed.grab() != sl.ERROR_CODE.SUCCESS:
