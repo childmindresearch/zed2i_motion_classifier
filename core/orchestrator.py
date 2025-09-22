@@ -10,17 +10,18 @@ from display import tracking_viewer
 from core import export, initialize_parameters, config
 
 
-def run(participant_id):
+def run(participant_id: str, display: bool = False) -> None:
     """This function is responsible for the main processing of the pipeline.
 
     The pipeline first waits for the user to initiate the lsl stream in LabRecorder. Enter "c" once complete.
-    An svo recording and the zed parameters are then initialized. The main processing loop then begins where for every frame,
-    the position, behavior, and ehad direction classificatiosn are calculated and returned in the terminal. A live
-    display with a skeleton overlay also appears. The pipeline will run indefinitely until user intervention when the user either
-    clicks "q" to quit or "d" when done.
+    An svo recording and the zed parameters are then initialized. The main processing loop then begins where
+    for every frame, the position, behavior, and head direction classifications are calculated and streamed to LabStreamingLayer.
+    If display argument was provided, a live display with a skeleton overlay also appears.
+    The pipeline will run indefinitely until user intervention when the user clicks "q" to quit.
 
     Args:
         participant_id: cli user input str containing ID number.
+        display: cli user input boolean to display live output with skeleton overlay.
     """
     # Create a Camera object
     zed = sl.Camera()
@@ -79,14 +80,6 @@ def run(participant_id):
             ])
             break
 
-        if key == ord("d"):
-            print("You pressed 'd', motion tracking is done.")
-            key_press = datetime.now()
-            lsl_outlet.push_sample([
-                f"done_key_press: {key_press.strftime('%Y-%m-%d %H:%M:%S.%f')}"
-            ])
-            break
-
         if zed.grab() == sl.ERROR_CODE.SUCCESS:
             # count frames
             f += 1
@@ -95,6 +88,9 @@ def run(participant_id):
             zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
             if len(bodies.body_list) == 0:
                 print("MOVE INTO FRAME")
+                lsl_outlet.push_sample([
+                    "Action: Undetermined, Behavior: Undetermined, Head Direction: Undetermined"
+                ])
             else:
                 selected_body = bodies.body_list[0]
                 behavior_result = behavior.get_behavior(selected_body)
@@ -103,17 +99,18 @@ def run(participant_id):
                 )
 
                 lsl_outlet.push_sample([
-                    f"Frame {f} - Action: {selected_body.action_state}, Behavior: {behavior_result}, Head Direction: {orientation}"
+                    f"Action: {selected_body.action_state}, Behavior: {behavior_result}, Head Direction: {orientation}"
                 ])
                 print(
                     f"Frame {f} - Action: {selected_body.action_state}, Behavior: {behavior_result}, Head Direction: {orientation}"
                 )
 
                 if postural_shift:
-                    lsl_outlet.push_sample([f"Frame {f} - POSTURAL SHIFT detected"])
+                    lsl_outlet.push_sample(["POSTURAL SHIFT detected"])
                     print(f"Frame {f} - POSTURAL SHIFT detected")
 
                 # Display skeletons
+            if display:
                 zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
                 image_left_ocv = image.get_data()
                 tracking_viewer.render_2D(
