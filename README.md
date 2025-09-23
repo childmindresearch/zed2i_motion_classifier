@@ -85,11 +85,12 @@ run get_python_api.py
 uv run get_python_api.py
 ```
 
+***NOTE:*** After running get_python_api.py, numpy>=2.3.0 will be automatically installed. This will cause additional dependency issues. Downgrade numpy to v2.1.0 In order to proceed with this package.
 
 6. Install repository-dependent packages
 
 ```sh
-uv pip install scipy pylsl
+uv pip install scipy==1.15.0 pylsl
 ```
 
 
@@ -106,8 +107,8 @@ Navigate to root:
 cd zed2i_motion_classifier
 ```
 
-Run the pipeline with Participant ID 100
+Run the pipeline with Participant ID 100 and live display
 
 ```sh
-uv run __main__.py -p "100"
+uv run __main__.py -p "100" -d
 ```

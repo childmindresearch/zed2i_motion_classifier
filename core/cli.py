@@ -1,9 +1,9 @@
 """CLI for zed2i_motion_classifier."""
 
 import argparse
-from typing import List, Optional
 
 from core import orchestrator
+
 
 def main() -> None:
     """Runs motion classification orchestrator with command line arguments.
@@ -17,7 +17,9 @@ def main() -> None:
     parser.add_argument(
         "-p", "--participant_id", required=True, type=str, help="Participant ID"
     )
+    parser.add_argument(
+        "-d", "--display", action="store_true", help="True to display output"
+    )
     arguments = parser.parse_args()
 
-    orchestrator.run(participant_id=arguments.participant_id)
-
+    orchestrator.run(participant_id=arguments.participant_id, display=arguments.display)
