@@ -85,7 +85,7 @@ run get_python_api.py
 uv run get_python_api.py
 ```
 
-***NOTE:*** After running get_python_api.py, numpy>=2.3.0 will be automatically installed. This will cause package incompatibility with other installed packages. Downgrade numpy to v2.1.0 In order to proceed with this package.
+***NOTE:*** After running get_python_api.py, numpy>=2.3.0 will be automatically installed. This will cause additional dependency issues. Downgrade numpy to v2.1.0 In order to proceed with this package.
 
 6. Install repository-dependent packages
 
