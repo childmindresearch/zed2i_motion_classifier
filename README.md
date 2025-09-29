@@ -67,7 +67,7 @@ uv venv zed2i_lsl_venv
 ```
  activate the environment
 ```sh
-zed2i_lsl_venv/Scripts/activate
+zed2i_lsl_venv\Scripts\activate
 ```
 
 5. Install the ZED Python API. Installation support documentation can be found here on the Stereolabs website (https://www.stereolabs.com/docs/app-development/python/install). However, follow our steps below for proper CMI/MoBI-specific API installation:
@@ -98,7 +98,7 @@ uv pip install scipy==1.15.0 pylsl
 Clone this repository inside ZED SDK:
 
 ```sh
-git clone https://github.com/cgmaiorano/zed2i_motion_classifier.git
+git clone https://github.com/childmindresearch/zed2i_motion_classifier.git
 ```
 
 Navigate to root:
