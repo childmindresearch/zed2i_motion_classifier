@@ -27,10 +27,11 @@ def run(participant_id: str, display: bool = False) -> None:
     zed = sl.Camera()
 
     # Create new stream info for lsl, stream camera_open, change source_id from "zed2i-harlem" to appropriate device, ex: "zed2i-midtown"
-    info = StreamInfo("MotionTracking", "Markers", 3, 0, "string", "zed2i-midtown")
+    info = StreamInfo("MotionTracking", "Markers", 4, 0, "string", "zed2i-midtown")
     lsl_outlet = StreamOutlet(info)
     # Set up channel names in the stream description
     channels = info.desc().append_child("channels")
+    channels.append_child("channel").append_child_value("label", "Camera Events")
     channels.append_child("channel").append_child_value("label", "Action")
     channels.append_child("channel").append_child_value("label", "Behavior")
     channels.append_child("channel").append_child_value("label", "Head Direction")
@@ -85,8 +86,11 @@ def run(participant_id: str, display: bool = False) -> None:
             print("You pressed 'q', quitting...")
             key_press = datetime.now()
             lsl_outlet.push_sample([
-                f"quit_key_press: {key_press.strftime('%Y-%m-%d %H:%M:%S.%f')}"
-            ])
+                f"quit_key_press: {key_press.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+                "",
+                "",
+                ""
+                ])
             break
 
         if zed.grab() == sl.ERROR_CODE.SUCCESS:
@@ -97,11 +101,16 @@ def run(participant_id: str, display: bool = False) -> None:
             zed.retrieve_image(image, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
             if len(bodies.body_list) == 0:
                 print("MOVE INTO FRAME")
+
                 lsl_outlet.push_sample([
-                    "Action: Undetermined, Behavior: Undetermined, Head Direction: Undetermined"
-                ])
+                    f"frame_{f}",
+                    "Undetermined",
+                    "Undetermined",
+                    "Undetermined"
+                    ])
             else:
                 selected_body = bodies.body_list[0]
+                action = selected_body.action_state
                 behavior_result = behavior.get_behavior(selected_body)
                 orientation, postural_shift = (
                     head_direction.get_head_orientation_with_posture(selected_body)
@@ -109,7 +118,8 @@ def run(participant_id: str, display: bool = False) -> None:
 
                 # Push data - now as a list with 4 separate values
                 lsl_outlet.push_sample([
-                    selected_body.action_state,
+                    f"frame_{f}",
+                    action,
                     behavior_result,
                     orientation
                 ])
@@ -117,9 +127,9 @@ def run(participant_id: str, display: bool = False) -> None:
                     f"Frame {f} - Action: {selected_body.action_state}, Behavior: {behavior_result}, Head Direction: {orientation}"
                 )
 
-                if postural_shift:
-                    lsl_outlet.push_sample(["POSTURAL SHIFT detected"])
-                    print(f"Frame {f} - POSTURAL SHIFT detected")
+                # if postural_shift:
+                #     lsl_outlet.push_sample(["POSTURAL SHIFT detected"])
+                #     print(f"Frame {f} - POSTURAL SHIFT detected")
 
                     # Display skeletons
                 if display:
@@ -139,8 +149,11 @@ def run(participant_id: str, display: bool = False) -> None:
         elif zed.grab() != sl.ERROR_CODE.SUCCESS:
             zed_err = datetime.now()
             lsl_outlet.push_sample([
-                f"failed_zed_connection: {zed_err.strftime('%Y-%m-%d %H:%M:%S.%f')}"
-            ])
+                f"failed_zed_connection: {zed_err.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+                "",
+                "",
+                ""
+                ])
             print("Failed ZED connection")
             break
 
@@ -153,5 +166,11 @@ def run(participant_id: str, display: bool = False) -> None:
     lsl_outlet.push_sample([
         f"camera_close: {end_time.strftime('%Y-%m-%d %H:%M:%S.%f')}"
     ])
+    lsl_outlet.push_sample([
+        f"camera_close: {end_time.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+        "",
+        "",
+        ""
+        ])
 
     cv2.destroyAllWindows()
