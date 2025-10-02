@@ -27,8 +27,17 @@ def run(participant_id: str, display: bool = False) -> None:
     zed = sl.Camera()
 
     # Create new stream info for lsl, stream camera_open, change source_id from "zed2i-harlem" to appropriate device, ex: "zed2i-midtown"
-    info = StreamInfo("MotionTracking", "Markers", 1, 0, "string", "zed2i-midtown")
+    info = StreamInfo("MotionTracking", "Markers", 3, 0, "string", "zed2i-midtown")
     lsl_outlet = StreamOutlet(info)
+    # Set up channel names in the stream description
+    channels = info.desc().append_child("channels")
+    channels.append_child("channel").append_child_value("label", "Action")
+    channels.append_child("channel").append_child_value("label", "Behavior")
+    channels.append_child("channel").append_child_value("label", "Head Direction")
+
+    # Create outlet
+    lsl_outlet = StreamOutlet(info)
+
 
     while True:
         key = input(
@@ -98,8 +107,11 @@ def run(participant_id: str, display: bool = False) -> None:
                     head_direction.get_head_orientation_with_posture(selected_body)
                 )
 
+                # Push data - now as a list with 4 separate values
                 lsl_outlet.push_sample([
-                    f"Action: {selected_body.action_state}, Behavior: {behavior_result}, Head Direction: {orientation}"
+                    selected_body.action_state,
+                    behavior_result,
+                    orientation
                 ])
                 print(
                     f"Frame {f} - Action: {selected_body.action_state}, Behavior: {behavior_result}, Head Direction: {orientation}"
