@@ -20,8 +20,13 @@ def record_svo(participant_ID, zed, lsl_outlet):
         / f"{participant_ID}_{datetime.now().strftime('%Y-%m-%d.%f')}.svo2"
     )
 
-    lsl_outlet.push_sample([f"SVO_recording_path: {output_svo_file}"])
-
+    lsl_outlet.push_sample([
+        f"SVO_recording_path: {output_svo_file}",
+            "",
+            "",
+            "",
+            ""
+            ])
     recording_param = sl.RecordingParameters()
     recording_param.compression_mode = sl.SVO_COMPRESSION_MODE.H264
     recording_param.video_filename = str(output_svo_file)
@@ -30,15 +35,24 @@ def record_svo(participant_ID, zed, lsl_outlet):
     if err != sl.ERROR_CODE.SUCCESS:
         print("Recording ZED : ", err)
         svo_start_time = datetime.now()
+
         lsl_outlet.push_sample([
-            f"svo_recording_err: {svo_start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}"
-        ])
+            f"svo_recording_err: {svo_start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+            "",
+            "",
+            "",
+            ""
+            ])
         exit(1)
 
     # Start Recording
     svo_start_time = datetime.now()
-    lsl_outlet.push_sample([
-        f"SVO_recording_start: {svo_start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}"
-    ])
 
+    lsl_outlet.push_sample([
+        f"SVO_recording_start: {svo_start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+            "",
+            "",
+            "",
+            ""
+            ])
     sl.RuntimeParameters()
