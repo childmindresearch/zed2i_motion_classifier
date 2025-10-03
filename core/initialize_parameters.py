@@ -29,6 +29,7 @@ def initialize_zed_parameters(zed, lsl_outlet):
         f"camera_open: {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}",
         "",
         "",
+        "",
         ""
         ])
 

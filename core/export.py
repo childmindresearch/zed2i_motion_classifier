@@ -24,6 +24,7 @@ def record_svo(participant_ID, zed, lsl_outlet):
         f"SVO_recording_path: {output_svo_file}",
             "",
             "",
+            "",
             ""
             ])
     recording_param = sl.RecordingParameters()
@@ -39,6 +40,7 @@ def record_svo(participant_ID, zed, lsl_outlet):
             f"svo_recording_err: {svo_start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}",
             "",
             "",
+            "",
             ""
             ])
         exit(1)
@@ -48,6 +50,7 @@ def record_svo(participant_ID, zed, lsl_outlet):
 
     lsl_outlet.push_sample([
         f"SVO_recording_start: {svo_start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+            "",
             "",
             "",
             ""
